@@ -16,21 +16,21 @@ public:
 
     Segment3D(const Point3D& start, const Point3D& end) : start(start), end(end) {}
 
-    float distanceTo(const Segment3D& other) const {
+    double distanceTo(const Segment3D& other) const {
         Vector3D u = Vector3D(start, end); // Vector of this segment
         Vector3D v = Vector3D(other.start, other.end); // Vector of other segment
         Vector3D w = Vector3D(start, other.start); // Vector between starts of segments
 
-        float a = u.dot(u); // |u|^2
-        float b = u.dot(v); // u.v
-        float c = v.dot(v); // |v|^2
-        float d = u.dot(w); // u.w
-        float e = v.dot(w); // v.w
+        double a = u.dot(u); // |u|^2
+        double b = u.dot(v); // u.v
+        double c = v.dot(v); // |v|^2
+        double d = u.dot(w); // u.w
+        double e = v.dot(w); // v.w
 
-        float D = a * c - b * b; // the determinant
+        double D = a * c - b * b; // the determinant
 
         // if the segments are parallel
-        if (D < std::numeric_limits<float>::epsilon()) {
+        if (D < std::numeric_limits<double>::epsilon()) {
             // return distance from one endpoint to the other segment
             return pointToSegmentDistance(start, other) < pointToSegmentDistance(end, other) ?
                 pointToSegmentDistance(start, other) :
@@ -38,8 +38,8 @@ public:
         }
 
         // Parameters for the nearest points on the segments
-        float sN = (b * e - c * d) / D;
-        float tN = (a * e - b * d) / D;
+        double sN = (b * e - c * d) / D;
+        double tN = (a * e - b * d) / D;
 
         // Clamp tN to [0,1]
         if (tN < 0) tN = 0;
@@ -61,12 +61,12 @@ public:
     }
 
 private:
-    float pointToSegmentDistance(const Point3D& p, const Segment3D& s) const {
+    double pointToSegmentDistance(const Point3D& p, const Segment3D& s) const {
         Vector3D v = Vector3D(s.start, s.end);
         Vector3D w = Vector3D(s.start, p);
-        float c1 = w.dot(v);
-		float c2 = v.dot(v);
-        float b = c1 / c2;
+        double c1 = w.dot(v);
+		double c2 = v.dot(v);
+        double b = c1 / c2;
 
         if (b < 0) return p.distanceTo(s.start); // Beyond the 'start' of the segment
         else if (b > 1) return p.distanceTo(s.end); // Beyond the 'end' of the segment

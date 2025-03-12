@@ -8,14 +8,14 @@
 
 class Vector3D {
 public:
-    float x, y, z;
+    double x, y, z;
 
-    Vector3D(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
+    Vector3D(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {}
 
     Vector3D(const Point3D& start, const Point3D& end) 
         : x(end.x - start.x), y(end.y - start.y), z(end.z - start.z) {}
 
-    float dot(const Vector3D& other) const {
+    double dot(const Vector3D& other) const {
         return x * other.x + y * other.y + z * other.z;
     }
 
@@ -25,7 +25,7 @@ public:
                         x * other.y - y * other.x);
     }
 
-    float length() const {
+    double length() const {
         return std::sqrt(x * x + y * y + z * z);
     }
 };
