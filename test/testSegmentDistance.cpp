@@ -81,7 +81,42 @@ TEST(Segment3D, ParallelSegments) {
 TEST(Segment3D, IntersectingSegments) {
     Segment3D s1(Point3D(0, 0, 0), Point3D(1, 1, 0));
     Segment3D s2(Point3D(0, 1, 0), Point3D(1, 0, 0));
+    EXPECT_NEAR(s1.distanceTo(s2), 0.0, 1e-6);
+}
+
+TEST(Segment3D, SkewSegments) {
+  Segment3D s1(Point3D(0, 0, 0), Point3D(1, 0, 0));
+  Segment3D s2(Point3D(0, 1, 1), Point3D(1, 1, 1));
+
+  // Calculate the expected distance (which is 1 in this case)
+  double expectedDistance = 1.0;
+  ASSERT_DOUBLE_EQ(s1.distanceTo(s2), expectedDistance);
+}
+
+TEST(Segment3D, GeneralCase) {
+    Segment3D s1(Point3D(0, 0, 0), Point3D(2, 0, 0));
+    Segment3D s2(Point3D(1, 1, 0), Point3D(1, 2, 0));
+    ASSERT_DOUBLE_EQ(s1.distanceTo(s2), 1.0);
+}
+
+TEST(Segment3D, PerpendicularSegments) {
+  Segment3D s1(Point3D(0, 0, 0), Point3D(1, 0, 0));
+  Segment3D s2(Point3D(0, 0, 0), Point3D(0, 1, 0));
+
+  // The segments intersect at (0, 0, 0), so the distance should be 0
+  ASSERT_DOUBLE_EQ(s1.distanceTo(s2), 0.0);
+}
+
+TEST(Segment3D, CollinearOverlappingSegments) {
+    Segment3D s1(Point3D(0, 0, 0), Point3D(2, 0, 0));
+    Segment3D s2(Point3D(1, 0, 0), Point3D(3, 0, 0));
     ASSERT_DOUBLE_EQ(s1.distanceTo(s2), 0.0);
+}
+
+TEST(Segment3D, CollinearNonOverlappingSegments) {
+    Segment3D s1(Point3D(0, 0, 0), Point3D(1, 0, 0));
+    Segment3D s2(Point3D(2, 0, 0), Point3D(3, 0, 0));
+    ASSERT_DOUBLE_EQ(s1.distanceTo(s2), 1.0); // Distance is 1 since closest points are (1,0,0) and (2,0,0)
 }
 
 
