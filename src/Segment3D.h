@@ -13,13 +13,30 @@
 class Segment3D {
 public:
     Point3D start, end;
+    static constexpr double EPSILON = 1e-9;
 
     Segment3D(const Point3D& start, const Point3D& end) : start(start), end(end) {}
 
+    bool isZeroLength() const {
+        return start.distanceTo(end) < EPSILON;
+    }
+
     double distanceTo(const Segment3D& other) const {
-        Vector3D u = Vector3D(start, end); // Vector of this segment
-        Vector3D v = Vector3D(other.start, other.end); // Vector of other segment
-        Vector3D w = Vector3D(start, other.start); // Vector between starts of segments
+        if (isZeroLength() && other.isZeroLength()) {
+            return start.distanceTo(other.start); // Distance between two points
+        }
+
+        if (isZeroLength()) {
+            return pointToSegmentDistance(start, other); // Distance from a point to a segment
+        }
+
+        if (other.isZeroLength()) {
+            return pointToSegmentDistance(other.start, *this); // Distance from a point to a segment
+        }
+
+        Vector3D u = Vector3D(start, end);
+        Vector3D v = Vector3D(other.start, other.end);
+        Vector3D w = Vector3D(start, other.start);
 
         double a = u.dot(u); // |u|^2
         double b = u.dot(v); // u.v
@@ -27,31 +44,48 @@ public:
         double d = u.dot(w); // u.w
         double e = v.dot(w); // v.w
 
-        double D = a * c - b * b; // the determinant
+        double D = a * c - b * b;
 
-        // if the segments are parallel
-        if (D < std::numeric_limits<double>::epsilon()) {
-            // return distance from one endpoint to the other segment
-            return pointToSegmentDistance(start, other) < pointToSegmentDistance(end, other) ?
-                pointToSegmentDistance(start, other) :
-                pointToSegmentDistance(end, other);
+        // Segments are parallel (or nearly parallel)
+        if (D < EPSILON) {
+            // Return the minimum distance from one segment's endpoints to the other segment
+            double dist1 = pointToSegmentDistance(start, other);
+            double dist2 = pointToSegmentDistance(end, other);
+            double dist3 = pointToSegmentDistance(other.start, *this);
+            double dist4 = pointToSegmentDistance(other.end, *this);
+
+            return std::min(std::min(dist1, dist2), std::min(dist3, dist4));
         }
 
         // Parameters for the nearest points on the segments
         double sN = (b * e - c * d) / D;
         double tN = (a * e - b * d) / D;
 
-        // Clamp tN to [0,1]
-        if (tN < 0) tN = 0;
-        else if (tN > 1) tN = 1;
+        // Clamp sN and tN to [0,1]
+        double sD = D;       // prevent division by zero
+        double tD = D;
 
-        // Clamp sN to [0,1]
-        if (sN < 0) {
-            sN = 0;
-            tN = e < 0 ? 1 : 0;
-        } else if (sN > 1) {
-            sN = 1;
-            tN = (b + e) < 0 ? 1 : 0;
+        // Clamp parameters to the segment
+        if (sN < 0.0) {        // sc < 0 => the s=0 edge is visible
+            sN = 0.0;
+            tN = e / c;
+            tN = (tN < 0.0) ? 0.0 : ((tN > 1.0) ? 1.0 : tN);
+        }
+        else if (sN > 1.0) {  // sc > 1 => the s=1 edge is visible
+            sN = 1.0;
+            tN = (e + b) / c;
+            tN = (tN < 0.0) ? 0.0 : ((tN > 1.0) ? 1.0 : tN);
+        }
+
+        if (tN < 0.0) {           // tc < 0 => the t=0 edge is visible
+            tN = 0.0;
+            sN = d / a;
+            sN = (sN < 0.0) ? 0.0 : ((sN > 1.0) ? 1.0 : sN);
+        }
+        else if (tN > 1.0) {     // tc > 1 => the t=1 edge is visible
+            tN = 1.0;
+            sN = (d + b) / a;
+            sN = (sN < 0.0) ? 0.0 : ((sN > 1.0) ? 1.0 : sN);
         }
 
         Point3D closestPoint1 = Point3D(start.x + sN * u.x, start.y + sN * u.y, start.z + sN * u.z);
@@ -65,14 +99,20 @@ private:
         Vector3D v = Vector3D(s.start, s.end);
         Vector3D w = Vector3D(s.start, p);
         double c1 = w.dot(v);
-		double c2 = v.dot(v);
+        double c2 = v.dot(v);
+
+        // If the segment is effectively a point, return distance to that point.
+        if (c2 < EPSILON) {
+            return p.distanceTo(s.start);
+        }
+
         double b = c1 / c2;
 
-        if (b < 0) return p.distanceTo(s.start); // Beyond the 'start' of the segment
-        else if (b > 1) return p.distanceTo(s.end); // Beyond the 'end' of the segment
+        if (b < 0) return p.distanceTo(s.start);
+        else if (b > 1) return p.distanceTo(s.end);
 
         Point3D Pb(s.start.x + b * v.x, s.start.y + b * v.y, s.start.z + b * v.z);
-        return p.distanceTo(Pb); // Return the distance to the closest point
+        return p.distanceTo(Pb);
     }
 };
 
