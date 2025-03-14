@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <limits>
+#include <algorithm>
 
 #include "Point3D.h"
 #include "Vector3D.h"
@@ -22,90 +23,51 @@ public:
     }
 
 double distanceTo(const Segment3D& other) const {
-    if (isZeroLength() && other.isZeroLength()) {
-        return start.distanceTo(other.start);
-    }
+    Vector3D p1 = Vector3D(start.x, start.y, start.z);
+    Vector3D q1 = Vector3D(end.x, end.y, end.z);
+    Vector3D p2 = Vector3D(other.start.x, other.start.y, other.start.z);
+    Vector3D q2 = Vector3D(other.end.x, other.end.y, other.end.z);
+    Vector3D d1 = q1 - p1; // Direction vector of segment 1
+    Vector3D d2 = q2 - p2; // Direction vector of segment 2
+    Vector3D r = p1 - p2;
 
-    if (isZeroLength()) {
-        return pointToSegmentDistance(start, other);
-    }
+    double a = d1.dot(d1);
+    double b = d1.dot(d2);
+    double c = d2.dot(d2);
+    double d = d1.dot(r);
+    double e = d2.dot(r);
+    double f = a * c - b * b;
 
-    if (other.isZeroLength()) {
-        return pointToSegmentDistance(other.start, *this);
-    }
+    double s, t;
 
-    Vector3D u = Vector3D(start, end);
-    Vector3D v = Vector3D(other.start, other.end);
-    Vector3D w = Vector3D(start, other.start);
-
-    double a = u.dot(u);
-    double b = u.dot(v);
-    double c = v.dot(v);
-    double d = u.dot(w);
-    double e = v.dot(w);
-
-    double D = a * c - b * b;
-
-    if (D < EPSILON) {
-        // Parallel or nearly parallel
-        double dist1 = pointToSegmentDistance(start, other);
-        double dist2 = pointToSegmentDistance(end, other);
-        double dist3 = pointToSegmentDistance(other.start, *this);
-        double dist4 = pointToSegmentDistance(other.end, *this);
-        return std::min(std::min(dist1, dist2), std::min(dist3, dist4));
-    }
-
-    // Parameters for the nearest points on the segments
-    double sN = (b * e - c * d);
-    double tN = (a * e - b * d);
-    double sD = D;
-    double tD = D;
-
-    // Clamp sN and tN to the interval [0, D]
-    bool s_is_clamped = false;
-    bool t_is_clamped = false;
-
-    if (sN < 0.0) {
-        sN = 0.0;
-        s_is_clamped = true;
-    } else if (sN > sD) {
-        sN = sD;
-        s_is_clamped = true;
-    }
-
-    if (tN < 0.0) {
-        tN = 0.0;
-        t_is_clamped = true;
-    } else if (tN > tD) {
-        tN = tD;
-        t_is_clamped = true;
-    }
-    
-    Point3D closestPoint1;
-    Point3D closestPoint2;
-
-    if (s_is_clamped || t_is_clamped) {
-        // If either s or t is clamped, we need to recompute the distance
-        if (s_is_clamped && t_is_clamped) {
-            // Both are clamped, the closest points are endpoints of the segments.
-             closestPoint1 = (sN == 0.0) ? start : end;
-             closestPoint2 = (tN == 0.0) ? other.start : other.end;
-        } else if (s_is_clamped) {
-            closestPoint1 = (sN == 0.0) ? start : end;
-            closestPoint2 = calculateClosestPoint(closestPoint1, other);
-        } else {
-             closestPoint2 = (tN == 0.0) ? other.start : other.end;
-             closestPoint1 = calculateClosestPoint(closestPoint2, *this);
-        }
-
+    // If segments are not parallel, compute closest point on L1 to L2 and
+    // clamp to segment S1.  Otherwise, pick arbitrary s (e.g., 0)
+    if (f < EPSILON) {        // S1 and S2 are nearly parallel
+        s = 0.0;
     }
     else {
-        closestPoint1 = Point3D(start.x + (sN / sD) * u.x, start.y + (sN / sD) * u.y, start.z + (sN / sD) * u.z);
-        closestPoint2 = Point3D(other.start.x + (tN / tD) * v.x, other.start.y + (tN / tD) * v.y, other.start.z + (tN / tD) * v.z);
+        s = (b * e - c * d) / f;
+        s = std::clamp(s, 0.0, 1.0); // Clamp s to [0, 1]
+    }
+    // Then compute closest point on L2 to S1(s)
+    t = (b * s + e) / c;
+
+    // If t in [0,1] done. else clamp t, recompute s for the new value
+    if (t < 0.0) {
+        t = 0.0;
+        s = std::clamp(-d / a, 0.0, 1.0);
+    }
+    else if (t > 1.0) {
+        t = 1.0;
+        s = std::clamp((b - d) / a, 0.0, 1.0);
     }
 
-    return closestPoint1.distanceTo(closestPoint2);
+    Vector3D c1 = p1 + d1 * s;
+    Vector3D c2 = p2 + d2 * t;
+
+    return (c1 - c2).length();
 }
+
 
 private:
 	Point3D calculateClosestPoint(const Point3D& point, const Segment3D& segment) const {
