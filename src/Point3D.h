@@ -5,7 +5,9 @@
 #define POINT3D_H
 #include <cmath>
 
-class Point3D {
+#include "Geometry.h"
+
+class Point3D:public Geometry {
 public:
     double x, y, z;
 
@@ -16,10 +18,22 @@ public:
     }
 
     double distanceTo(const Point3D& other) const {
-        return std::sqrt((x - other.x) * (x - other.x) + 
-                         (y - other.y) * (y - other.y) + 
-                         (z - other.z) * (z - other.z));
+        double dx = x - other.x;
+        double dy = y - other.y;
+        double dz = z - other.z;
+        return std::sqrt(dx * dx + dy * dy + dz * dz);
     }
+
+    double distanceTo(const Geometry* other) const override {
+        const Point3D* otherPoint = dynamic_cast<const Point3D*>(other);
+        if (otherPoint == nullptr) {
+            // if the other is not point, then what the distance we should return?
+            return -1;
+        }
+        return distanceTo(*otherPoint);
+    }
+
+    //Point3D* clone() const override { return new Point3D(*this); }
 };
 
 #endif // POINT3D_H
