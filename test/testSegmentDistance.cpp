@@ -76,6 +76,10 @@ TEST(Segment3D, ParallelSegments) {
     Segment3D seg6(Point3D(2, 0, 0), Point3D(3, 0, 0)); // Collinear, non-overlapping
     ASSERT_DOUBLE_EQ(seg5.distanceTo(seg6), 1.0);
 
+  Segment3D seg7(Point3D(0, 1, 1), Point3D(1, 1, 1));
+
+  double expectedDistance = std::sqrt(2.0);
+  ASSERT_DOUBLE_EQ(seg1.distanceTo(seg7), expectedDistance);
 }
 
 TEST(Segment3D, IntersectingSegments) {
@@ -85,12 +89,12 @@ TEST(Segment3D, IntersectingSegments) {
 }
 
 TEST(Segment3D, SkewSegments) {
-  Segment3D s1(Point3D(0, 0, 0), Point3D(1, 0, 0));
-  Segment3D s2(Point3D(0, 1, 1), Point3D(1, 1, 1));
+  Segment3D seg1(Point3D(0, 1, 0), Point3D(1, 0, 0));
+  Segment3D seg2(Point3D(0, 0, 1), Point3D(1, 1, 1));
 
-  // Calculate the expected distance (which is 1 in this case)
+  // Calculate the expected distance (which is equal to z = 1 in this partial case)
   double expectedDistance = 1.0;
-  ASSERT_DOUBLE_EQ(s1.distanceTo(s2), expectedDistance);
+  ASSERT_DOUBLE_EQ(seg1.distanceTo(seg2), expectedDistance);
 }
 
 TEST(Segment3D, GeneralCase) {
