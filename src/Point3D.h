@@ -13,10 +13,6 @@ public:
 
     Point3D(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {}
 
-    Point3D operator-(const Point3D& other) const {
-        return Point3D(x - other.x, y - other.y, z - other.z);
-    }
-
     double distanceTo(const Point3D& other) const {
         double dx = x - other.x;
         double dy = y - other.y;
@@ -28,12 +24,11 @@ public:
         const Point3D* otherPoint = dynamic_cast<const Point3D*>(&other);
         if (otherPoint == nullptr) {
             // if the other is not point, then what the distance we should return?
-            return -1;
+            return -1; // also, for example, it can be std::numeric_limits<double>::infinity()
         }
         return distanceTo(*otherPoint);
     }
 
-    //Point3D* clone() const override { return new Point3D(*this); }
 };
 
 #endif // POINT3D_H
