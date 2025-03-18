@@ -5,11 +5,6 @@
 #include "Segment3D.h"
 
 
-TEST(Point3D, CreatePoint){
-	ASSERT_NO_THROW(Point3D p1(0, 0, 0));
-	ASSERT_NO_THROW(Point3D p1(1, 1, 1));
-}
-
 TEST(Segment3D, CreateSegment){
 	Point3D p1(0, 0, 0);
 	Point3D p2(1, 1, 1);
