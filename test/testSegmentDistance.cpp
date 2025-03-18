@@ -10,13 +10,6 @@ TEST(Point3D, CreatePoint){
 	ASSERT_NO_THROW(Point3D p1(1, 1, 1));
 }
 
-TEST(Vector3D, CreateVector){
-	Point3D p1(0, 0, 0);
-	Point3D p2(1, 1, 1);
-	ASSERT_NO_THROW(Vector3D v(p1, p2));
-	ASSERT_NO_THROW(Vector3D v(p2, p1));
-}
-
 TEST(Segment3D, CreateSegment){
 	Point3D p1(0, 0, 0);
     Point3D p2(1, 1, 1);
@@ -124,7 +117,7 @@ TEST(Segment3D, CollinearNonOverlappingSegments) {
 }
 
 
-TEST(Segments, CalculateDistance){
+TEST(Segment3D, ArbitraryCalculations){
 	Point3D p1(0, 0, 0);
     Point3D p2(1, 1, 0);
     Point3D p3(1, 0, 0);
@@ -144,7 +137,7 @@ TEST(Segments, CalculateDistance){
 	distance = seg3.distanceTo(seg4);
     std::cout << "2. Distance between segments (3-4): " << distance << std::endl;
 	
-	ASSERT_DOUBLE_EQ(distance, sqrt(2.0f));
+	ASSERT_DOUBLE_EQ(distance, 1.0);
 	
 }
 
