@@ -25,9 +25,6 @@ public:
         if (other.hasZeroLength) {
             return pointToSegmentDistance(other.start, *this);
         }
-        if (&other == this) {
-            return 0.0;
-        }
         Vector3D p1 = Vector3D(start.x, start.y, start.z);
         Vector3D q1 = Vector3D(end.x, end.y, end.z);
         Vector3D p2 = Vector3D(other.start.x, other.start.y, other.start.z);
@@ -85,23 +82,6 @@ public:
     ~Segment3D() override {}
 
 private:
-    Point3D calculateClosestPoint(const Point3D& point, const Segment3D& segment) const {
-        Vector3D segmentVector = Vector3D(segment.start, segment.end);
-        Vector3D pointVector = Vector3D(segment.start, point);
-        double t = pointVector.dot(segmentVector) / segmentVector.dot(segmentVector);
-
-        if (t < 0) {
-            return segment.start;
-        }
-        else if (t > 1) {
-            return segment.end;
-        }
-        else {
-            return Point3D(segment.start.x + t * segmentVector.x,
-                segment.start.y + t * segmentVector.y,
-                segment.start.z + t * segmentVector.z);
-        }
-    }
 
     double pointToSegmentDistance(const Point3D& p, const Segment3D& s) const {
         if (s.hasZeroLength) {
