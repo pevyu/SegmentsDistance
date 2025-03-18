@@ -102,6 +102,11 @@ TEST(Segment3D, PerpendicularSegments) {
 
 	// The segments intersect at (0, 0, 0), so the distance should be 0
 	ASSERT_DOUBLE_EQ(s1.distanceTo(s2), 0.0);
+
+	// Non-intersecting perpendicular segments
+	Segment3D s3(Point3D(0, 1, 0), Point3D(0, 2, 0));
+	ASSERT_DOUBLE_EQ(s1.distanceTo(s3), 1.0);
+
 }
 
 TEST(Segment3D, CollinearOverlappingSegments) {
