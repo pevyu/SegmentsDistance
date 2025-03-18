@@ -35,8 +35,8 @@ public:
         return std::sqrt(x * x + y * y + z * z);
     }
 
-    double distanceTo(const Geometry* other) const override {
-        const Vector3D* otherVector = dynamic_cast<const Vector3D*>(other);
+    double distanceTo(const Geometry& other) const override {
+        const Vector3D* otherVector = dynamic_cast<const Vector3D*>(&other);
         if (nullptr == otherVector) {
             return std::numeric_limits<double>::infinity();
         }

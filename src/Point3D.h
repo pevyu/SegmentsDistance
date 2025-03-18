@@ -24,8 +24,8 @@ public:
         return std::sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    double distanceTo(const Geometry* other) const override {
-        const Point3D* otherPoint = dynamic_cast<const Point3D*>(other);
+    double distanceTo(const Geometry& other) const override {
+        const Point3D* otherPoint = dynamic_cast<const Point3D*>(&other);
         if (otherPoint == nullptr) {
             // if the other is not point, then what the distance we should return?
             return -1;

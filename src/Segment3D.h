@@ -18,17 +18,30 @@ public:
 
     Segment3D(const Point3D& start, const Point3D& end) : start(start), end(end), hasZeroLength(start.distanceTo(end) < EPSILON) {}
 
-    double distanceTo(const Segment3D& other) const {
-        if (hasZeroLength) {
-            return pointToSegmentDistance(start, other);
+    double distanceTo(const Geometry& other) const override {
+        const Segment3D* otherSegment = dynamic_cast<const Segment3D*>(&other);
+        if (nullptr == otherSegment) {
+            return std::numeric_limits<double>::infinity();
         }
-        if (other.hasZeroLength) {
-            return pointToSegmentDistance(other.start, *this);
+
+        return distanceTo(otherSegment);
+    }
+
+    ~Segment3D() override {}
+
+private:
+
+    double distanceTo(const Segment3D* other) const {
+        if (hasZeroLength) {
+            return pointToSegmentDistance(start, *other);
+        }
+        if (other->hasZeroLength) {
+            return pointToSegmentDistance(other->start, *this);
         }
         Vector3D p1 = Vector3D(start.x, start.y, start.z);
         Vector3D q1 = Vector3D(end.x, end.y, end.z);
-        Vector3D p2 = Vector3D(other.start.x, other.start.y, other.start.z);
-        Vector3D q2 = Vector3D(other.end.x, other.end.y, other.end.z);
+        Vector3D p2 = Vector3D(other->start.x, other->start.y, other->start.z);
+        Vector3D q2 = Vector3D(other->end.x, other->end.y, other->end.z);
         Vector3D d1 = q1 - p1; // Direction vector of segment 1
         Vector3D d2 = q2 - p2; // Direction vector of segment 2
         Vector3D r = p1 - p2;
@@ -69,19 +82,6 @@ public:
 
         return (c1 - c2).length();
     }
-
-    double distanceTo(const Geometry* other) const override {
-        const Segment3D* otherSegment = dynamic_cast<const Segment3D*>(other);
-        if (nullptr == otherSegment) {
-            return std::numeric_limits<double>::infinity();
-        }
-
-        return distanceTo(otherSegment);
-    }
-
-    ~Segment3D() override {}
-
-private:
 
     double pointToSegmentDistance(const Point3D& p, const Segment3D& s) const {
         if (s.hasZeroLength) {
