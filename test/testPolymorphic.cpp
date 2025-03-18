@@ -5,7 +5,7 @@
 // The polymorphism is not fully implemented, yet.
 // So, just handle unacceptable cases without any calculations
 
-TEST(Point3D, PointToVectorDistance) {
+TEST(Polimorphic, PointToVectorDistance) {
 	Point3D p1(0, 0, 0);
 	Point3D p2(1, 1, 1);
 	Point3D p3(10, 10, 1);
@@ -16,7 +16,7 @@ TEST(Point3D, PointToVectorDistance) {
 
 }
 
-TEST(Point3D, VectorToPointDistance) {
+TEST(Polimorphic, VectorToPointDistance) {
 	Point3D p1(0, 0, 0);
 	Point3D p2(1, 1, 1);
 	Point3D p3(10, 10, 1);
@@ -26,7 +26,7 @@ TEST(Point3D, VectorToPointDistance) {
 	ASSERT_DOUBLE_EQ(v1.distanceTo(p1), std::numeric_limits<double>::infinity());
 }
 
-TEST(Point3D, PointToSegmentDistance) {
+TEST(Polimorphic, PointToSegmentDistance) {
 	Point3D p1(0, 0, 0);
 	Point3D p2(1, 1, 1);
 	Point3D p3(10, 10, 1);
@@ -37,7 +37,7 @@ TEST(Point3D, PointToSegmentDistance) {
 
 }
 
-TEST(Point3D, SegmentToPointDistance) {
+TEST(Polimorphic, SegmentToPointDistance) {
 	Point3D p1(0, 0, 0);
 	Point3D p2(1, 1, 1);
 	Point3D p3(10, 10, 1);
@@ -47,7 +47,7 @@ TEST(Point3D, SegmentToPointDistance) {
 	ASSERT_DOUBLE_EQ(s1.distanceTo(p1), std::numeric_limits<double>::infinity());
 }
 
-TEST(Point3D, VectorToSegmentDistance) {
+TEST(Polimorphic, VectorToSegmentDistance) {
 	Point3D p1(0, 0, 0);
 	Point3D p2(1, 1, 1);
 	Point3D p3(10, 10, 1);
@@ -58,7 +58,7 @@ TEST(Point3D, VectorToSegmentDistance) {
 	ASSERT_DOUBLE_EQ(v1.distanceTo(s1), std::numeric_limits<double>::infinity());
 }
 
-TEST(Point3D, SegmentToVectorDistance) {
+TEST(Polimorphic, SegmentToVectorDistance) {
 	Point3D p1(0, 0, 0);
 	Point3D p2(1, 1, 1);
 	Point3D p3(10, 10, 1);
